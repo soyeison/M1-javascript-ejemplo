@@ -33,7 +33,9 @@ const {
 // < 16
 
 function exponencial(exp) {
-
+    return function (par){
+        return Math.pow(par, exp)
+    }
 }
 
 // ----- Recursión -----
@@ -69,8 +71,18 @@ function exponencial(exp) {
 // haciendo los movimientos SUR->ESTE->NORTE
 // Aclaraciones: el segundo parametro que recibe la funcion ('direccion') puede ser pasado vacio (null)
 
-function direcciones(laberinto) {
-
+function direcciones(laberinto, array = []) {
+    for(var property in laberinto){
+        if(typeof laberinto[property] === "object"){
+            array.push(property);
+            return direcciones(laberinto[property], array);
+        }
+        if(laberinto[property] === "destino"){
+            array.push(property)
+            return array.join("")
+        }
+    }
+    return "";
 }
 
 
@@ -88,7 +100,21 @@ function direcciones(laberinto) {
 // deepEqualArrays([0,1,[[0,1,2],1,2]], [0,1,[[0,1,2],1,2]]) => true
 
 function deepEqualArrays(arr1, arr2) {
-
+    if(arr1.length !== arr2.length) return false;
+    for (let i = 0; i <= arr1.length -1; i++){
+        if(Array.isArray(arr1[i], arr2[i])){
+            if(deepEqualArrays(arr1[i],arr2[i])){
+                return false
+            }
+        }
+        if(arr1[i] !== arr2[i]){
+            return false
+        }
+        else{
+            return true
+        }
+    }
+    return true
 }
 
 
@@ -139,7 +165,19 @@ OrderedLinkedList.prototype.print = function(){
 // < 'head --> 5 --> 3 --> 1 --> null'
 //               4
 OrderedLinkedList.prototype.add = function(val){
-    
+    let node = new Node(val);
+    if(this.head == null){
+        this.head = node;
+    }
+    else{
+        let current = this.head;
+        while(current.value < val){
+            current = current.next;
+        }
+        var aux = current.next;
+        current.next = node;
+        current.next.next = aux;
+    }
 }
 
 
@@ -159,7 +197,20 @@ OrderedLinkedList.prototype.add = function(val){
 // < null
 
 OrderedLinkedList.prototype.removeHigher = function(){
-    
+    var current = this.head
+    if(this.head == null){
+        return null
+    }
+    else if(current.next == null){
+        var aux = current.value
+        this.head = null
+        return aux
+    }
+    else{
+        aux = current.value
+        this.head = current.next
+        return aux
+    }
 }
 
 
@@ -179,7 +230,23 @@ OrderedLinkedList.prototype.removeHigher = function(){
 // < null
 
 OrderedLinkedList.prototype.removeLower = function(){
-    
+    var current = this.head
+    if(current == null){
+        return null
+    }
+    else if(current.next == null){
+        var aux = current.value
+        this.head = null
+        return aux
+    }
+    else{
+        while(current.next.next != null){
+            current = current.next
+        }
+        aux = current.next.value
+        current.next = null
+    }
+    return aux
 }
 
 
@@ -230,8 +297,12 @@ function multiCallbacks(cbs1, cbs2){
 // 5   9
 // resultado:[5,8,9,32,64]
 
-BinarySearchTree.prototype.toArray = function() {
-    
+BinarySearchTree.prototype.toArray = function(array = []) {
+    if (this.left) this.left.toArray(array)
+    array.push(this.value);
+    if (this.right) this.right.toArray(array)
+
+    return array.sort(function(a,b){return a - b;})
 }
 
 
@@ -250,7 +321,33 @@ BinarySearchTree.prototype.toArray = function() {
 // informarse sobre algoritmos, leerlos de un pseudocodigo e implemnterlos alcanzara
 
 function primalityTest(n) {
-    
+    if(n < 2){
+        return false
+    }
+    if(n == 2){
+        return true
+    }
+    if(n == 3){
+        return true
+    }
+    if(n % 2 == 0){
+        return false
+    }
+    if(n % 3 == 0){
+        return false
+    }
+
+    var i = 5;
+    var w = 2;
+
+    while(i * i <= n){
+        if(n % i == 0){
+            return false
+        }
+        i += w;
+        w = 6 - w;
+    }
+    return true
 }
 
 
@@ -260,7 +357,25 @@ function primalityTest(n) {
 // https://en.wikipedia.org/wiki/Quicksort
 
 function quickSort(array) {
-    
+    if(array.length < 2){
+        return array
+    }
+    let pivot = array[Math.floor(Math.random() * array.length)]
+    var left = [];
+    var right = [];
+    var equal = [];
+    for(var i = 0; i < array.length; i++){
+        if(array[i] > pivot){             
+            right.push(array[i])
+        }
+        else if(array[i] < pivot){
+            left.push(array[i])
+        }
+        else{
+            equal.push(array[i])
+        }
+    }
+    return quickSort(right).concat(equal, quickSort(left))
 }
 // QuickSort ya lo conocen solo que este 
 // ordena de mayor a menor
